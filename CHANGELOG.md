@@ -11,6 +11,17 @@ that predates the changesets pipeline.
 
 <!-- changeset-insert-anchor -->
 
+## [0.9.0] — 2026-11-22
+
+### Minor Changes
+
+- [#557](https://github.com/aterrylu/autonomOS/pull/557) `7f1f5a9` — feat(orgchart): opens left-right with stacked reports (Terry's pick, ADR-160)
+
+### Patch Changes
+
+- [#577](https://github.com/aterrylu/autonomOS/pull/577) `cf6b0e8` — fix(dashboard): a pane resizes xterm only together with the PTY (ADR-161)
+
+
 ## [0.8.0] — 2026-10-29
 
 ### Minor Changes
