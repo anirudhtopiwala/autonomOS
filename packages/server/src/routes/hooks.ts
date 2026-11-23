@@ -10,6 +10,7 @@ import { type Context, Hono } from "hono";
 import { verifyAgentToken } from "../agentCredentials.js";
 import { observeStatus, observeTool } from "../agents/analytics.js";
 import { notePromptHookEvent } from "../agents/promptDelivery.js";
+import { persistProviderThreadId } from "../agents/providerThread.js";
 import { getAgent, listAgents, markActivity } from "../agents/store.js";
 import { emitAgentDelta } from "../events/agents.js";
 import { noteHandoffDelivery } from "../handoffDelivery.js";
@@ -506,6 +507,9 @@ hooksIngestRouter.post("/:sessionId", async (c) => {
   // straggling Gemini event from a session that already exited.
   const agent = getAgent(sessionId);
   let body: HookEvent;
+  // A provider that reads its hook command's stdout gets its own reply
+  // (Antigravity's SessionStart injectSteps); everyone else the usual ack.
+  let reply: Record<string, unknown> | undefined;
   if (!agent) {
     console.debug(
       `[hooks] ${sessionId.slice(0, 8)} hook for unknown session — passing through without translation (raw=${String(rawBody.hook_event_name)})`,
@@ -513,14 +517,20 @@ hooksIngestRouter.post("/:sessionId", async (c) => {
     body = rawBody as HookEvent;
   } else {
     const provider = getProvider(agent.provider ?? "claude-code");
+    // CLI-assigned conversation id carried on the raw event → providerThreadId
+    // (before normalizing: even an event we drop still names it).
+    const threadId = provider.threadIdFromEvent?.(rawBody);
+    if (threadId)
+      persistProviderThreadId(sessionId, threadId, `hooks:${provider.name}`);
+    reply = provider.hookReply?.(rawBody, sessionId);
     const normalized = provider.normalizeEvent?.(rawBody);
     if (normalized === null) {
       // Provider explicitly dropped this event (logged with reason at
       // provider level). Echo at the route level for sessionId correlation.
       console.debug(
-        `[hooks] ${sessionId.slice(0, 8)} provider=${provider.name} dropped event: ${String(rawBody.hook_event_name)}`,
+        `[hooks] ${sessionId.slice(0, 8)} provider=${provider.name} dropped event: ${String(rawBody.hook_event_name ?? rawBody.hookEventName)}`,
       );
-      return c.json({ ok: true, event: "dropped", sessionId });
+      return c.json(reply ?? { ok: true, event: "dropped", sessionId });
     }
     body = (normalized ?? rawBody) as HookEvent;
   }
@@ -723,7 +733,7 @@ hooksIngestRouter.post("/:sessionId", async (c) => {
     }
   }
 
-  return c.json({ ok: true, event, sessionId });
+  return c.json(reply ?? { ok: true, event, sessionId });
 });
 
 // ── Read surface (public listener, token-gated) ──────────────────────

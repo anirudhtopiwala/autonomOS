@@ -40,9 +40,13 @@ export interface RuntimePermissionAxis {
    * starting a session: `parse-time` — an invalid value fails argv parsing
    * with the list of allowed choices; `config-load` — Codex's config loader
    * lists the allowed variants and loads (or rejects) each value we use;
-   * `schema` — Codex's offline app-server schema lists the enum.
+   * `schema` — Codex's offline app-server schema lists the enum;
+   * `settings-load` — Antigravity validates each `--settings` value before a
+   * session-less subcommand (`agy --settings '{"k":"v"}' mcp list`) and
+   * rejects an unknown one, but never lists the allowed values, so the probe
+   * can report a REMOVED value, never a new one.
    */
-  probe: "parse-time" | "config-load" | "schema";
+  probe: "parse-time" | "config-load" | "schema" | "settings-load";
   /**
    * Values the CLI still accepts that are deliberately NOT offered, and why —
    * so the drift probe doesn't report them as new.
@@ -251,6 +255,67 @@ export const RUNTIME_PERMISSIONS: Readonly<
       },
     ],
   },
+  // Measured on agy 1.5.14 (ADR-162). Both axes are settings.json keys applied
+  // per spawn through `--settings` (never saved): `--settings` REJECTS an
+  // unknown value at startup, while `--mode` silently ignores one and runs
+  // whatever the account's default is (auto, on a personal account).
+  antigravity: {
+    runtime: "antigravity",
+    verifiedOn: "1.5.14",
+    axes: [
+      {
+        key: "agentMode",
+        via: '--settings {"agentMode": <value>} (default: "")',
+        source:
+          "Antigravity CLI reference (agentMode, Shift+Tab cycle default > accept-edits > auto > plan)",
+        probe: "settings-load",
+        values: [
+          {
+            // The settings value is "" — the CLI's cycle and docs call it
+            // "default". Our label → their value, like Gemini's `default`.
+            value: "default",
+            description: "Asks before running tools and making edits.",
+          },
+          {
+            value: "accept-edits",
+            description: "Automatically accepts file edits.",
+          },
+          {
+            value: "auto",
+            description:
+              "The agent decides when to ask; needs the terminal sandbox.",
+            caveat:
+              "Antigravity's own default for personal accounts when nothing is set. Not available on business or enterprise accounts.",
+          },
+          { value: "plan", description: "Research and plan only." },
+        ],
+      },
+      {
+        key: "toolPermission",
+        via: '--settings {"toolPermission": <value>}',
+        source: "Antigravity CLI reference (toolPermission)",
+        probe: "settings-load",
+        values: [
+          {
+            value: "request-review",
+            description: "Asks for review before a tool runs (the default).",
+          },
+          {
+            value: "strict",
+            description: "Asks for review of every tool call.",
+          },
+          {
+            value: "proceed-in-sandbox",
+            description: "Runs tools without asking inside the sandbox.",
+          },
+          {
+            value: "always-proceed",
+            description: "Runs every tool without asking.",
+          },
+        ],
+      },
+    ],
+  },
 };
 
 // ── An agent's permission setting, in its runtime's vocabulary ─────────────
@@ -281,6 +346,8 @@ export const DEFAULT_RUNTIME_VALUES: Readonly<
     collaboration_mode: "default",
   },
   "gemini-cli": { "approval-mode": "default" },
+  // Pinned explicitly: agy's own default on a personal account is `auto`.
+  antigravity: { agentMode: "default", toolPermission: "request-review" },
 };
 
 /** Every runtime with a permission table, in display order. */
@@ -288,6 +355,7 @@ export const PERMISSION_RUNTIMES: readonly Provider[] = [
   "claude-code",
   "codex",
   "gemini-cli",
+  "antigravity",
 ];
 
 /** Same runtime and the same value on every axis. */
@@ -350,6 +418,12 @@ export function permissionFromLegacyMode(
       plan: { "approval-mode": "plan" },
       bypass: { "approval-mode": "yolo" },
     },
+    antigravity: {
+      ask: {},
+      auto: { agentMode: "accept-edits" },
+      plan: { agentMode: "plan" },
+      bypass: { toolPermission: "always-proceed" },
+    },
   };
   return completePermission(runtime, byRuntime[runtime]?.[mode] ?? {});
 }
@@ -390,6 +464,17 @@ export function legacyModeFor(
           : v["approval-mode"] === "plan"
             ? "plan"
             : "ask";
+    case "antigravity":
+      // Both tool-permission values that run tools without asking count as
+      // never-asks, so widening a default to either needs confirmNeverAsks.
+      return v.toolPermission === "always-proceed" ||
+        v.toolPermission === "proceed-in-sandbox"
+        ? "bypass"
+        : v.agentMode === "plan"
+          ? "plan"
+          : v.agentMode === "accept-edits" || v.agentMode === "auto"
+            ? "auto"
+            : "ask";
     default:
       return "ask"; // no table for this runtime (see completePermission)
   }
@@ -418,6 +503,7 @@ export function formatPermission(p: RuntimePermission): string {
   const quiet: Record<string, string> = {
     approvals_reviewer: "user",
     collaboration_mode: "default",
+    toolPermission: "request-review",
   };
   return axes
     .filter(
@@ -543,6 +629,15 @@ export const PERMISSIVENESS: Readonly<
   },
   "gemini-cli": {
     "approval-mode": ["plan", "default", "auto_edit", "yolo"],
+  },
+  antigravity: {
+    agentMode: ["plan", "default", "accept-edits", "auto"],
+    toolPermission: [
+      "strict",
+      "request-review",
+      "proceed-in-sandbox",
+      "always-proceed",
+    ],
   },
 };
 

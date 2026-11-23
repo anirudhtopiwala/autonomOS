@@ -59,7 +59,7 @@ export interface ToolDef {
 export const TOOL_CREATE_AGENT: ToolDef = {
   name: "create_agent",
   description:
-    "Create a new agent — a dedicated CLI session with a name, context, and optional task. Defaults to Claude Code; set `provider` to spawn a Codex or Gemini agent instead.",
+    "Create a new agent — a dedicated CLI session with a name, context, and optional task. Defaults to Claude Code; set `provider` to spawn a Codex, Gemini or Antigravity agent instead.",
   inputSchema: {
     type: "object",
     properties: {
@@ -106,7 +106,7 @@ export const TOOL_CREATE_AGENT: ToolDef = {
         // `provider` (JSON Schema can't key one on the other). The server
         // rejects a bad value with that runtime's valid values.
         description:
-          "The agent's permission in its runtime's OWN values (ADR-115) — requires `provider`. Omit to use the operator's default for that runtime (on a resume: keep the agent's current setting). Examples — claude-code: `acceptEdits`; codex: `approval_policy=never sandbox_mode=danger-full-access`; gemini-cli: `auto_edit`. An invalid value is rejected with the runtime's valid values.",
+          "The agent's permission in its runtime's OWN values (ADR-115) — requires `provider`. Omit to use the operator's default for that runtime (on a resume: keep the agent's current setting). Examples — claude-code: `acceptEdits`; codex: `approval_policy=never sandbox_mode=danger-full-access`; gemini-cli: `auto_edit`; antigravity: `agentMode=accept-edits`. An invalid value is rejected with the runtime's valid values.",
       },
       template: {
         type: "string",
@@ -125,9 +125,9 @@ export const TOOL_CREATE_AGENT: ToolDef = {
       },
       provider: {
         type: "string",
-        enum: ["claude-code", "codex", "gemini-cli"],
+        enum: ["claude-code", "codex", "gemini-cli", "antigravity"],
         description:
-          "Agent runtime/CLI to spawn (default: 'claude-code'). 'codex' = OpenAI Codex CLI, 'gemini-cli' = Google Gemini CLI. The chosen CLI must be installed on the host.",
+          "Agent runtime/CLI to spawn (default: 'claude-code'). 'codex' = OpenAI Codex CLI, 'gemini-cli' = Google Gemini CLI, 'antigravity' = Google Antigravity CLI (agy). The chosen CLI must be installed on the host.",
       },
       envPreset: {
         type: "string",
@@ -532,7 +532,7 @@ export const TOOL_CREATE_ENV_PRESET: ToolDef = {
       },
       provider: {
         type: "string",
-        enum: ["claude-code", "codex", "gemini-cli"],
+        enum: ["claude-code", "codex", "gemini-cli", "antigravity"],
         description:
           "Base provider this override targets (default 'claude-code').",
       },
@@ -568,7 +568,7 @@ export const TOOL_UPDATE_ENV_PRESET: ToolDef = {
       description: { type: "string" },
       provider: {
         type: "string",
-        enum: ["claude-code", "codex", "gemini-cli"],
+        enum: ["claude-code", "codex", "gemini-cli", "antigravity"],
       },
       label: { type: "string" },
       env: {

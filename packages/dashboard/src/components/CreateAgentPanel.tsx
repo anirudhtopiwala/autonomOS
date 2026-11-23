@@ -570,6 +570,7 @@ function RuntimeCard({
       "https://docs.anthropic.com/en/docs/claude-code/getting-started",
     codex: "https://github.com/openai/codex",
     "gemini-cli": "https://github.com/google-gemini/gemini-cli",
+    antigravity: "https://antigravity.google/docs/getting-started",
   };
 
   let background = c.faint;

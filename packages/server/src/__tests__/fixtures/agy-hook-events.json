@@ -1,0 +1,131 @@
+{
+ "source": "agy 1.5.14, `agy -p` read-only turn (read_file) in a workspace with all six hook events registered; raw stdin payloads in order; home path renamed",
+ "events": [
+  {
+   "artifactDirectoryPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68",
+   "conversationId": "e01aa70a-e58a-489b-934f-15d903a44a68",
+   "cwd": "/home/user/agy-probe",
+   "hookEventName": "SessionStart",
+   "lastUserInput": "Read the file note.txt and tell me its contents in one line.",
+   "modelName": "gemini-3.8-flash-high",
+   "transcriptPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68/.system_generated/logs/transcript_full.jsonl",
+   "workspacePaths": [
+    "/home/user/agy-probe"
+   ]
+  },
+  {
+   "artifactDirectoryPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68",
+   "conversationId": "e01aa70a-e58a-489b-934f-15d903a44a68",
+   "cwd": "/home/user/agy-probe",
+   "hookEventName": "PreInvocation",
+   "initialNumSteps": 1,
+   "invocationNum": 0,
+   "lastUserInput": "Read the file note.txt and tell me its contents in one line.",
+   "modelName": "gemini-3.8-flash-high",
+   "transcriptPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68/.system_generated/logs/transcript_full.jsonl",
+   "workspacePaths": [
+    "/home/user/agy-probe"
+   ]
+  },
+  {
+   "artifactDirectoryPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68",
+   "conversationId": "e01aa70a-e58a-489b-934f-15d903a44a68",
+   "cwd": "/home/user/agy-probe",
+   "hookEventName": "PreToolUse",
+   "lastUserInput": "Read the file note.txt and tell me its contents in one line.",
+   "modelName": "gemini-3.8-flash-high",
+   "stepIdx": 2,
+   "toolCall": {
+    "args": {
+     "Path": "/home/user/agy-probe/note.txt"
+    },
+    "id": "call_663698376118623382",
+    "name": "read_file"
+   },
+   "transcriptPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68/.system_generated/logs/transcript_full.jsonl",
+   "workspacePaths": [
+    "/home/user/agy-probe"
+   ]
+  },
+  {
+   "artifactDirectoryPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68",
+   "conversationId": "e01aa70a-e58a-489b-934f-15d903a44a68",
+   "cwd": "/home/user/agy-probe",
+   "error": "",
+   "hookEventName": "PostToolUse",
+   "lastUserInput": "Read the file note.txt and tell me its contents in one line.",
+   "modelName": "gemini-3.8-flash-high",
+   "stepIdx": 2,
+   "toolCall": {
+    "args": {
+     "Path": "/home/user/agy-probe/note.txt"
+    },
+    "id": "call_663698376118623382",
+    "name": "read_file"
+   },
+   "transcriptPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68/.system_generated/logs/transcript_full.jsonl",
+   "workspacePaths": [
+    "/home/user/agy-probe"
+   ]
+  },
+  {
+   "artifactDirectoryPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68",
+   "conversationId": "e01aa70a-e58a-489b-934f-15d903a44a68",
+   "cwd": "/home/user/agy-probe",
+   "hookEventName": "PostInvocation",
+   "initialNumSteps": 1,
+   "invocationNum": 0,
+   "lastUserInput": "Read the file note.txt and tell me its contents in one line.",
+   "modelName": "gemini-3.8-flash-high",
+   "transcriptPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68/.system_generated/logs/transcript_full.jsonl",
+   "workspacePaths": [
+    "/home/user/agy-probe"
+   ]
+  },
+  {
+   "artifactDirectoryPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68",
+   "conversationId": "e01aa70a-e58a-489b-934f-15d903a44a68",
+   "cwd": "/home/user/agy-probe",
+   "hookEventName": "PreInvocation",
+   "initialNumSteps": 3,
+   "invocationNum": 1,
+   "lastUserInput": "Read the file note.txt and tell me its contents in one line.",
+   "modelName": "gemini-3.8-flash-high",
+   "transcriptPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68/.system_generated/logs/transcript_full.jsonl",
+   "workspacePaths": [
+    "/home/user/agy-probe"
+   ]
+  },
+  {
+   "artifactDirectoryPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68",
+   "conversationId": "e01aa70a-e58a-489b-934f-15d903a44a68",
+   "cwd": "/home/user/agy-probe",
+   "hookEventName": "PostInvocation",
+   "initialNumSteps": 3,
+   "invocationNum": 1,
+   "lastUserInput": "Read the file note.txt and tell me its contents in one line.",
+   "modelName": "gemini-3.8-flash-high",
+   "transcriptPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68/.system_generated/logs/transcript_full.jsonl",
+   "workspacePaths": [
+    "/home/user/agy-probe"
+   ]
+  },
+  {
+   "artifactDirectoryPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68",
+   "continuationActive": false,
+   "conversationId": "e01aa70a-e58a-489b-934f-15d903a44a68",
+   "cwd": "/home/user/agy-probe",
+   "error": "",
+   "executionNum": 0,
+   "fullyIdle": true,
+   "hookEventName": "Stop",
+   "lastUserInput": "Read the file note.txt and tell me its contents in one line.",
+   "modelName": "gemini-3.8-flash-high",
+   "terminationReason": "NO_TOOL_CALL",
+   "transcriptPath": "/home/user/.gemini/antigravity-cli/brain/e01aa70a-e58a-489b-934f-15d903a44a68/.system_generated/logs/transcript_full.jsonl",
+   "workspacePaths": [
+    "/home/user/agy-probe"
+   ]
+  }
+ ]
+}

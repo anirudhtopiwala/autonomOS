@@ -11,6 +11,7 @@ What the installer does, how to manage the background service, how to update, an
 | Claude Code, logged in | `claude --version`, then `claude` starts without asking you to log in | Install from [claude.com/claude-code](https://claude.com/claude-code), run `claude` once, complete the login. |
 | Codex CLI (optional) | `codex --version` | Only if you want Codex agents. See [Other runtimes](08-other-runtimes.md). |
 | Gemini CLI (optional) | `gemini --version` | Only if you want Gemini agents. See [Other runtimes](08-other-runtimes.md). |
+| Antigravity CLI (optional) | `agy --version` | Only if you want Antigravity agents, for example on a Google AI Pro plan. See [Other runtimes](08-other-runtimes.md#antigravity). |
 
 The installer checks for both Node and Claude Code before it downloads anything. Without Claude Code it stops with "Error: Claude Code is required and was not found on PATH." and a three-step fix (install it, run `claude` once to log in, re-run the installer). The server refuses to start without Claude Code, so there is no point installing around it; if you must, `SKIP_CLAUDE_CHECK=1` in front of the command skips the check and the service will crash-loop until Claude Code exists.
 

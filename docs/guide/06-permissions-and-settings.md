@@ -6,12 +6,12 @@ Permission modes in detail, then every control in the Settings panel.
 
 Every agent has one of four modes, chosen in the "Create New Agent" form and shown in the terminal's bottom line. The mode decides when the agent stops to ask you.
 
-| Mode | Claude Code | Codex | Gemini |
-|---|---|---|---|
-| **Ask** | "Defers to Claude Code's own default (no flag passed) — your ~/.claude/settings.json defaultMode may change it (e.g. acceptEdits)" | "Asks on request (approval_policy: on-request)" | "Prompts on each tool use" |
-| **Accept edits** | "Auto-accepts edits (acceptEdits)" | "Runs commands, asks only on failure (on-failure)" | "Auto-accepts edits (auto_edit)" |
-| **Plan** | "Read-only plan mode" | "Not supported — falls back to Ask" | "Read-only plan mode" |
-| **Bypass** | "Skips all prompts (--dangerously-skip-permissions)" | "No approvals (approval_policy: never)" | "Auto-approves everything (yolo)" |
+| Mode | Claude Code | Codex | Gemini | Antigravity |
+|---|---|---|---|---|
+| **Ask** | "Defers to Claude Code's own default (no flag passed) — your ~/.claude/settings.json defaultMode may change it (e.g. acceptEdits)" | "Asks on request (approval_policy: on-request)" | "Prompts on each tool use" | "Asks before tools and edits (agentMode default)" |
+| **Accept edits** | "Auto-accepts edits (acceptEdits)" | "Runs commands, asks only on failure (on-failure)" | "Auto-accepts edits (auto_edit)" | "Auto-accepts edits (agentMode accept-edits)" |
+| **Plan** | "Read-only plan mode" | "Not supported — falls back to Ask" | "Read-only plan mode" | "Research and plan only (agentMode plan)" |
+| **Bypass** | "Skips all prompts (--dangerously-skip-permissions)" | "No approvals (approval_policy: never)" | "Auto-approves everything (yolo)" | "Runs every tool without asking (toolPermission always-proceed)" |
 
 These are the strings the "?" button in the form shows.
 

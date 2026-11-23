@@ -83,6 +83,7 @@ import { acquireOwnership, removePidFile } from "./pid-file.js";
 import { claudeUsageRouter } from "./plugins/claude-usage/route.js";
 import { codexUsageRouter } from "./plugins/codex-usage/route.js";
 import { installUnhandledRejectionLogger } from "./processSafetyNet.js";
+import { writeAntigravityConfig } from "./providers/antigravity.js";
 import { writeGeminiSettings } from "./providers/gemini-cli.js";
 import { getAllProviders, isProviderInstalled } from "./providers/index.js";
 import { initPtyInputLog } from "./ptyInputLog.js";
@@ -969,6 +970,18 @@ export async function runServer(argv: readonly string[]): Promise<void> {
       } catch (err) {
         console.warn(
           "[gemini-cli] Failed to write settings — Gemini agents will launch without hooks/MCP:",
+          err instanceof Error ? err.message : err,
+        );
+      }
+    }
+    // Same constraint for Antigravity: its autonomOS entry in agy's global
+    // hooks.json / mcp_config.json bakes in both planes (ADR-162).
+    if (isProviderInstalled("antigravity")) {
+      try {
+        writeAntigravityConfig(CHANNEL_SERVER_SCRIPT);
+      } catch (err) {
+        console.warn(
+          "[antigravity] Failed to write agy config — Antigravity agents will launch without hooks/MCP:",
           err instanceof Error ? err.message : err,
         );
       }

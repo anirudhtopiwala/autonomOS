@@ -42,6 +42,7 @@ export const PROVIDER_VALUES = [
   "claude-code",
   "codex",
   "gemini-cli",
+  "antigravity",
 ] as const satisfies readonly Provider[];
 type NotListed = Exclude<Provider, (typeof PROVIDER_VALUES)[number]>;
 export const _allProvidersListed: NotListed extends never ? true : false = true;
@@ -94,7 +95,7 @@ const createAgentCommonShape = {
     .enum(PROVIDER_VALUES)
     .optional()
     .describe(
-      "Agent runtime/CLI to spawn (default: 'claude-code'). 'codex' = OpenAI Codex CLI, 'gemini-cli' = Google Gemini CLI. The chosen CLI must be installed on the host.",
+      "Agent runtime/CLI to spawn (default: 'claude-code'). 'codex' = OpenAI Codex CLI, 'gemini-cli' = Google Gemini CLI, 'antigravity' = Google Antigravity CLI (agy). The chosen CLI must be installed on the host.",
     ),
   envPreset: z
     .string()
@@ -147,7 +148,7 @@ export const createAgentShape = {
     .string()
     .optional()
     .describe(
-      "The agent's permission in its runtime's OWN values (ADR-115) — requires `provider`. Omit to use the operator's default for that runtime (on a resume: keep the agent's current setting). Examples — claude-code: `acceptEdits`; codex: `approval_policy=never sandbox_mode=danger-full-access`; gemini-cli: `auto_edit`. An invalid value is rejected with the runtime's valid values.",
+      "The agent's permission in its runtime's OWN values (ADR-115) — requires `provider`. Omit to use the operator's default for that runtime (on a resume: keep the agent's current setting). Examples — claude-code: `acceptEdits`; codex: `approval_policy=never sandbox_mode=danger-full-access`; gemini-cli: `auto_edit`; antigravity: `agentMode=accept-edits`. An invalid value is rejected with the runtime's valid values.",
     ),
 };
 export const CreateAgentBody = z.object(createAgentShape);

@@ -18,6 +18,10 @@
  *   for real (exit 0 = accepted). Runs with a throwaway CODEX_HOME.
  * - schema (Codex collaboration mode): `codex app-server
  *   generate-json-schema` is offline and lists the enum.
+ * - settings-load (Antigravity): `agy --settings '{"key":"value"}' mcp list`
+ *   validates the settings, then lists MCP servers — no session, no model
+ *   call. An unknown value fails with `unrecognized value`. agy never lists
+ *   the allowed values, so this finds a removed value, never a new one.
  *
  * Runs off the spawn path (at startup, and when a CLI's binary changes);
  * results are cached per binary + mtime and served by GET /api/providers.
@@ -106,7 +110,7 @@ export function compareAxis(
 
 // ── Running the probes ────────────────────────────────────────
 
-interface Run {
+export interface Run {
   code: number;
   output: string;
 }
@@ -147,6 +151,31 @@ async function codexAccepts(
   );
 }
 
+/** Our table value → the settings.json value agy takes ("default" is ""). */
+export function agySettingsValue(key: string, value: string): string {
+  return key === "agentMode" && value === "default" ? "" : value;
+}
+
+/** agy accepts a settings value iff a session-less subcommand loads it. */
+export function agyAcceptsOutput(r: Run): boolean {
+  return r.code === 0 && !/unrecognized value|invalid value/i.test(r.output);
+}
+
+async function agyAccepts(
+  binary: string,
+  key: string,
+  value: string,
+): Promise<boolean> {
+  return agyAcceptsOutput(
+    await run(binary, [
+      "--settings",
+      JSON.stringify({ [key]: value }),
+      "mcp",
+      "list",
+    ]),
+  );
+}
+
 async function probeAxis(
   runtime: Provider,
   binary: string,
@@ -161,6 +190,16 @@ async function probeAxis(
   if (runtime === "gemini-cli") {
     const r = await run(binary, [`--${axis.key}`, INVALID, "--list-sessions"]);
     return parseGeminiChoices(r.output);
+  }
+  if (runtime === "antigravity") {
+    const loads = await Promise.all(
+      axis.values.map(async ({ value }) =>
+        (await agyAccepts(binary, axis.key, agySettingsValue(axis.key, value)))
+          ? value
+          : null,
+      ),
+    );
+    return loads.filter((v): v is string => v !== null);
   }
   // codex
   if (axis.probe === "schema") {

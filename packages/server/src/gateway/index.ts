@@ -12,8 +12,9 @@
  */
 
 import type { UUID } from "@autonomos/core";
+import { persistProviderThreadId } from "../agents/providerThread.js";
 import { setChannelServerProbe } from "../agents/runtime.js";
-import { getAgent, markActivity, patchAgent } from "../agents/store.js";
+import { getAgent, markActivity } from "../agents/store.js";
 import { emitAgentDelta } from "../events/agents.js";
 import {
   noteAgentMessage,
@@ -152,28 +153,9 @@ export async function initGateway(): Promise<void> {
   // Persist a Codex agent's conversation thread id when it's first discovered,
   // so a later server/daemon restart can resume the conversation instead of
   // forking a fresh thread. Deduped — only write when the id actually changes.
-  setCodexThreadIdSink((agentId, threadId) => {
-    const agent = getAgent(agentId);
-    if (!agent || agent.providerThreadId === threadId) return;
-    const result = patchAgent(agentId, { providerThreadId: threadId });
-    if (result === undefined || result === "stale") {
-      // The sink fires once per agent lifetime; a dropped write here means
-      // resume capability is silently lost until the next restart. Surface it.
-      console.warn(
-        `[gateway] failed to persist Codex thread id for ${agentId.slice(0, 8)} (${result ?? "agent missing"}) — conversation resume may not work on next restart`,
-      );
-      return;
-    }
-    // Keep optimistic-concurrency clients in sync with the version bump (matches
-    // the write-then-emit pattern of other patchAgent callers), so a dashboard
-    // holding a stale version token doesn't 409 on its next edit.
-    emitAgentDelta({
-      type: "agent.updated",
-      id: result.id,
-      patch: { providerThreadId: threadId },
-      version: result.version,
-    });
-  });
+  setCodexThreadIdSink((agentId, threadId) =>
+    persistProviderThreadId(agentId, threadId, "gateway"),
+  );
 
   console.log("[gateway] initialized");
 }

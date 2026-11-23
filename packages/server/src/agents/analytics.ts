@@ -159,6 +159,10 @@ export function supportFor(
     return { tools: false, needsInput: false, failedTools: false };
   if (provider === "gemini-cli")
     return { tools: true, needsInput: true, failedTools: false };
+  // agy has tool hooks and reports a failed tool (PostToolUse `error`), but
+  // no permission-prompt event, so "waiting on you" isn't observable.
+  if (provider === "antigravity")
+    return { tools: true, needsInput: false, failedTools: true };
   return { tools: true, needsInput: true, failedTools: true };
 }
 

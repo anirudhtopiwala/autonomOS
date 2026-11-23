@@ -17,6 +17,7 @@ export const CLI_COMMANDS: Record<Provider, string> = {
   "claude-code": "claude",
   codex: "codex",
   "gemini-cli": "gemini",
+  antigravity: "agy",
 };
 
 export interface CliDriftResult {

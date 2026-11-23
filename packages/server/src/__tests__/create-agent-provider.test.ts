@@ -15,6 +15,7 @@ describe("create_agent tool exposes provider", () => {
     >;
     assert.ok(props.provider, "create_agent must have a `provider` property");
     assert.deepEqual([...(props.provider.enum ?? [])].sort(), [
+      "antigravity",
       "claude-code",
       "codex",
       "gemini-cli",

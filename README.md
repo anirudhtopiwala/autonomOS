@@ -2,7 +2,7 @@
 
 # autonomOS
 
-**Multi-agent harness for CLI coding agents — orchestrate Claude Code, Codex, and Gemini CLI.**
+**Multi-agent harness for CLI coding agents — orchestrate Claude Code, Codex, Gemini CLI, and Antigravity CLI.**
 
 **[autonomos.terrylu.cloud](https://autonomos.terrylu.cloud)**
 
@@ -35,7 +35,7 @@ If you want to **use** autonomOS rather than build it, the [User Guide](docs/gui
 
 ## Install
 
-You need **Node 20+** and **Claude Code installed and logged in** (`claude` on PATH; run it once to sign in). Codex and Gemini CLI are optional. Then, one line:
+You need **Node 20+** and **Claude Code installed and logged in** (`claude` on PATH; run it once to sign in). Codex, Gemini CLI and Antigravity CLI are optional. Then, one line:
 
 ```bash
 curl -fsSL https://autonomos.terrylu.cloud/install.sh | bash
@@ -83,18 +83,18 @@ Then open `http://<server-name>:3000` from any device on your tailnet. Nothing o
 
 ## Coding-CLI support
 
-autonomOS is CLI-agnostic by design: every runtime plugs into the same message bus and the same MCP toolbelt, so coordination is written once and works across all of them. **Claude Code and Codex are fully supported.** **Gemini CLI runs as a full agent;** messages sent to it arrive in the **Incoming messages** panel, where you deliver them into the session with a click. Everything else — spawning, status, sending, permissions — works the same.
+autonomOS is CLI-agnostic by design: every runtime plugs into the same message bus and the same MCP toolbelt, so coordination is written once and works across all of them. **Claude Code and Codex are fully supported.** **Gemini CLI runs as a full agent;** messages sent to it arrive in the **Incoming messages** panel, where you deliver them into the session with a click. **Antigravity CLI** (`agy`) runs the same way, and is how a Google AI Pro, Ultra or free personal plan backs an agent now that Gemini CLI no longer serves those accounts. Everything else — spawning, status, sending, permissions — works the same.
 
-| Capability | Claude Code | Codex | Gemini CLI |
-|---|:---:|:---:|:---:|
-| Spawn as a managed agent | ✅ | ✅ *(daemon + remote TUI)* | ✅ *(interactive CLI)* |
-| Live status telemetry | ✅ hooks | ✅ event stream | ✅ hooks *(translated)* |
-| Shared MCP toolbelt | ✅ | ✅ | ✅ |
-| **Send** to other agents | ✅ | ✅ | ✅ |
-| **Receive** from other agents | ✅ automatic | ✅ automatic, *inline in the TUI* | via **Incoming messages** — you deliver with a click |
-| Permission modes | ✅ all four | ✅ *(no Plan mode)* | ✅ all four |
-| Usage bar in the dashboard | ✅ 5h / 7d | ✅ | ❌ |
-| Resume across restarts | ✅ | ✅ | ❌ starts a fresh session |
+| Capability | Claude Code | Codex | Gemini CLI | Antigravity CLI |
+|---|:---:|:---:|:---:|:---:|
+| Spawn as a managed agent | ✅ | ✅ *(daemon + remote TUI)* | ✅ *(interactive CLI)* | ✅ *(interactive CLI)* |
+| Live status telemetry | ✅ hooks | ✅ event stream | ✅ hooks *(translated)* | ✅ hooks *(translated; no "needs input")* |
+| Shared MCP toolbelt | ✅ | ✅ | ✅ | ✅ |
+| **Send** to other agents | ✅ | ✅ | ✅ | ✅ |
+| **Receive** from other agents | ✅ automatic | ✅ automatic, *inline in the TUI* | via **Incoming messages** — you deliver with a click | via **Incoming messages** |
+| Permission modes | ✅ all four | ✅ *(no Plan mode)* | ✅ all four | ✅ agy's own (`agentMode`, `toolPermission`) |
+| Usage bar in the dashboard | ✅ 5h / 7d | ✅ | ❌ | ❌ *(agy's `/usage` in its terminal)* |
+| Resume across restarts | ✅ | ✅ | ❌ starts a fresh session | ✅ |
 
 **How it works.** Three pieces make cross-CLI coordination possible. The **message bus** is a URI router: address any agent as `agent://name` and the gateway delivers to the right session, acknowledging the send only once the destination has accepted it — hiding a per-runtime delivery path (Claude Code over a WebSocket channel; Codex injected into its `app-server` daemon so messages render *inline* in the live TUI) behind one uniform address space. **Incoming messages** is the delivery path for Gemini CLI: the message is accepted and queued, the agent's row shows a "✉" badge, and a small panel on its terminal lets you deliver or discard each one; the queue is persisted, capped at ten, and only clears an item once the agent has actually taken it. The **shared MCP** is a single set of tools — `create_agent`, `send`, `set_manager`, `get_org_chart`, schedules, presets — injected into every agent in its provider-native way, so a Claude Code agent and a Codex agent call the *same* `send()` with identical schemas. Adding a runtime is implementing one provider interface, not re-plumbing the bus.
 

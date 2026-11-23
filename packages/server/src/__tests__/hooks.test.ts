@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, it } from "node:test";
@@ -17,8 +17,10 @@ import { mintAgentToken, verifyAgentToken } from "../agentCredentials.js";
 import {
   _resetCacheForTesting as _resetAgentsForTesting,
   buildAgent,
+  getAgent,
   insertAgent,
 } from "../agents/store.js";
+import { antigravityProvider } from "../providers/antigravity.js";
 import {
   agentStatusRouter,
   clearAgentState,
@@ -739,5 +741,92 @@ describe("hooks — Gemini event translation", () => {
     const body = (await res.json()) as { event: string };
     assert.equal(body.event, "dropped");
     assert.equal(getAgentState(sid).status, "working");
+  });
+});
+
+// ── Antigravity (agy): real 1.5.14 payloads through the route ──────────
+//
+// agy assigns its own conversation id and reports it on every hook; the route
+// persists it as providerThreadId (the resume pointer), and answers
+// SessionStart with the agent's system prompt (agy reads the hook's stdout).
+
+describe("hooks — Antigravity through the route", () => {
+  const sid = "test-agy-001";
+  const events: Record<string, unknown>[] = JSON.parse(
+    readFileSync(
+      new URL("./fixtures/agy-hook-events.json", import.meta.url),
+      "utf8",
+    ),
+  ).events;
+  const byName = (n: string) =>
+    events.find((e) => e.hookEventName === n) as Record<string, unknown>;
+
+  beforeEach(() => {
+    _resetAgentsForTesting();
+    insertAgent(
+      buildAgent({
+        id: sid,
+        name: "agy-test",
+        workingDirectory: "/tmp",
+        provider: "antigravity",
+        providerSessionId: sid,
+        permissionMode: "ask",
+      }),
+    );
+  });
+
+  afterEach(() => {
+    clearNotifications(sid);
+    clearAgentState(sid);
+    _resetAgentsForTesting();
+  });
+
+  it("SessionStart persists the conversation id and returns injectSteps", async () => {
+    antigravityProvider.buildArgs({
+      workingDirectory: "/tmp",
+      cwd: "/tmp",
+      sessionId: sid,
+      agentName: "agy-test",
+      providerSessionId: sid,
+      injectChannelServer: true,
+      channelServerScript: "/x.mjs",
+      serverPort: "1",
+      socketPath: "/tmp/x.sock",
+      apiUrl: "http://localhost:1",
+      appendSystemPrompt: "Route test prompt.",
+    });
+    const res = await postHookEvent(sid, byName("SessionStart"));
+    const body = (await res.json()) as {
+      injectSteps?: { systemMessage: { systemMessage: string } }[];
+    };
+    assert.match(
+      body.injectSteps?.[0].systemMessage.systemMessage ?? "",
+      /Route test prompt\.$/,
+    );
+    assert.equal(
+      getAgent(sid)?.providerThreadId,
+      byName("SessionStart").conversationId,
+    );
+  });
+
+  it("a real turn walks ready → working → tool_running → working → idle", async () => {
+    const statuses: string[] = [];
+    for (const e of events) {
+      await postHookEvent(sid, e);
+      statuses.push(getAgentState(sid).status);
+    }
+    // SessionStart, PreInvocation#0, PreToolUse, PostToolUse, PostInvocation
+    // (dropped), PreInvocation#1 (dropped), PostInvocation (dropped), Stop.
+    assert.deepEqual(statuses, [
+      "ready",
+      "working",
+      "tool_running",
+      "working",
+      "working",
+      "working",
+      "working",
+      "idle",
+    ]);
+    assert.equal(getAgentState(sid).currentTool, undefined);
   });
 });

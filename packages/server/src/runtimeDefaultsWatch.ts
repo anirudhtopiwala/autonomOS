@@ -31,6 +31,7 @@ const NAMES: Record<Provider, string> = {
   "claude-code": "Claude Code",
   codex: "Codex",
   "gemini-cli": "Gemini CLI",
+  antigravity: "Antigravity CLI",
 };
 
 export interface DefaultsChange {

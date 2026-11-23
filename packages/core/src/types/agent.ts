@@ -16,7 +16,7 @@ import type { RuntimePermission } from "./runtimePermissions";
 
 export type UUID = string;
 
-export type Provider = "claude-code" | "codex" | "gemini-cli";
+export type Provider = "claude-code" | "codex" | "gemini-cli" | "antigravity";
 
 /** Lifecycle status. Two values today; future states (archived, detached) are
  *  strictly additive — clients should treat unknown values as "exited". */

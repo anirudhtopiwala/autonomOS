@@ -33,6 +33,7 @@ export const RUNTIME_NAMES: Record<Provider, string> = {
   "claude-code": "Claude Code",
   codex: "Codex",
   "gemini-cli": "Gemini CLI",
+  antigravity: "Antigravity CLI",
 };
 
 export { PERMISSION_RUNTIMES };

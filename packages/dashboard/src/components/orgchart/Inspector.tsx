@@ -31,6 +31,7 @@ const PROVIDER_NAMES: Record<string, string> = {
   "claude-code": "Claude Code",
   codex: "Codex",
   "gemini-cli": "Gemini CLI",
+  antigravity: "Antigravity CLI",
 };
 
 /**

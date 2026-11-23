@@ -6,6 +6,7 @@
  */
 
 import type { AgentProvider } from "@autonomos/core";
+import { antigravityProvider } from "./antigravity.js";
 import { claudeCodeProvider } from "./claude-code.js";
 import { codexProvider } from "./codex.js";
 import { geminiCliProvider } from "./gemini-cli.js";
@@ -14,6 +15,7 @@ const providers = new Map<string, AgentProvider>([
   ["claude-code", claudeCodeProvider],
   ["codex", codexProvider],
   ["gemini-cli", geminiCliProvider],
+  ["antigravity", antigravityProvider],
 ]);
 
 /** Get a provider by name. Throws if unknown. */

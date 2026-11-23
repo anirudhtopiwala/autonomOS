@@ -153,6 +153,7 @@ export const PERMISSION_MODE_INFO: Record<
       "claude-code":
         "Asks before each privileged action (permission-mode default)",
       "gemini-cli": "Prompts on each tool use",
+      antigravity: "Asks before tools and edits (agentMode default)",
       codex: "Asks on request (approval_policy: on-request)",
     },
   },
@@ -164,6 +165,7 @@ export const PERMISSION_MODE_INFO: Record<
     perProvider: {
       "claude-code": "Auto-accepts edits (acceptEdits)",
       "gemini-cli": "Auto-accepts edits (auto_edit)",
+      antigravity: "Auto-accepts edits (agentMode accept-edits)",
       // Codex DOES have an auto tier — automatic approval review
       // (`approvals_reviewer=auto_review`, `--approve-for-me`, codex 0.154) —
       // but autonomOS doesn't wire it up yet, so auto is clamped to Ask
@@ -180,6 +182,7 @@ export const PERMISSION_MODE_INFO: Record<
     perProvider: {
       "claude-code": "Read-only plan mode",
       "gemini-cli": "Read-only plan mode",
+      antigravity: "Research and plan only (agentMode plan)",
       codex:
         "Not wired up yet — Codex's plan mode isn't supported in autonomOS, so this behaves like Ask",
     },
@@ -192,6 +195,8 @@ export const PERMISSION_MODE_INFO: Record<
     perProvider: {
       "claude-code": "Skips all prompts (--dangerously-skip-permissions)",
       "gemini-cli": "Auto-approves everything (yolo)",
+      antigravity:
+        "Runs every tool without asking (toolPermission always-proceed)",
       codex: "No approvals (approval_policy: never)",
     },
   },

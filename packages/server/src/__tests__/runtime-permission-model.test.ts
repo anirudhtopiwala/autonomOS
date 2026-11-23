@@ -68,6 +68,14 @@ describe("migration from the shared vocabulary keeps effective behavior", () => 
       plan: "on-request",
       bypass: "never",
     },
+    // Primary axis is agentMode; bypass lives on the second axis
+    // (toolPermission=always-proceed), asserted below.
+    antigravity: {
+      ask: "default",
+      auto: "accept-edits",
+      plan: "plan",
+      bypass: "default",
+    },
   };
   for (const r of RUNTIMES) {
     for (const mode of PERMISSION_MODES) {
@@ -77,6 +85,11 @@ describe("migration from the shared vocabulary keeps effective behavior", () => 
         assert.equal(p.values[primary], expected[r][mode]);
         if (r === "codex")
           assert.equal(p.values.sandbox_mode, "danger-full-access");
+        if (r === "antigravity")
+          assert.equal(
+            p.values.toolPermission,
+            mode === "bypass" ? "always-proceed" : "request-review",
+          );
       });
     }
   }

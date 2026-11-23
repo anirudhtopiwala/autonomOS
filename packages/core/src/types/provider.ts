@@ -18,7 +18,7 @@ export interface PtyHandle {
 }
 
 export interface AgentProvider {
-  /** Provider identifier (e.g. "claude-code", "codex", "gemini-cli") */
+  /** Provider identifier (e.g. "claude-code", "codex", "gemini-cli", "antigravity") */
   readonly name: string;
 
   /** Human-readable display name (e.g. "Claude Code", "Codex CLI") */
@@ -201,6 +201,26 @@ export interface AgentProvider {
   normalizeEvent?(raw: Record<string, unknown>): Record<string, unknown> | null;
 
   /**
+   * Optional: the CLI's own conversation id carried by a RAW hook event, for
+   * providers whose conversation id is assigned by the CLI (not preset by us)
+   * and only reported through hooks (Antigravity's `conversationId`). The hook
+   * route persists it as the agent's `providerThreadId` — the same field and
+   * resume path Codex uses — so a restart resumes the conversation.
+   */
+  threadIdFromEvent?(raw: Record<string, unknown>): string | undefined;
+
+  /**
+   * Optional: the JSON body the hook route answers a RAW hook event with, for
+   * a CLI that reads its hook command's stdout (Antigravity's SessionStart
+   * `injectSteps`). Undefined keeps the route's usual `{ ok, event }` reply.
+   * Only reaches the agent if the provider's hook command keeps curl's output.
+   */
+  hookReply?(
+    raw: Record<string, unknown>,
+    sessionId: string,
+  ): Record<string, unknown> | undefined;
+
+  /**
    * Provider capabilities — what this backend supports.
    * Used by the dashboard to show feature availability.
    */
@@ -249,7 +269,7 @@ export interface ProviderCapabilities {
   systemPrompt: {
     supported: boolean;
     /** How the prompt is injected */
-    method: "flag" | "prepend-to-prompt" | "none";
+    method: "flag" | "prepend-to-prompt" | "session-start-hook" | "none";
   };
   /** Inter-agent messaging */
   messaging: {

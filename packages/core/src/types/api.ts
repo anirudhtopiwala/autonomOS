@@ -181,7 +181,8 @@ export interface ProjectSession {
   sessionId: string;
   /** Which agent backend owns the session — drives the provider icon on the
    *  row. Set by the discovery layer: "claude-code" for ~/.claude sessions,
-   *  "codex" for ~/.codex rollouts, "gemini-cli" for Gemini. */
+   *  "codex" for ~/.codex rollouts, "gemini-cli" for Gemini, "antigravity"
+   *  for Antigravity CLI agents. */
   provider: string;
   /** Display title: the resolved title (SDK customTitle → JSONL title cache →
    *  first prompt) with the raw SDK summary as the final fallback. */

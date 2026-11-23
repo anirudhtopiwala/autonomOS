@@ -10,7 +10,7 @@ You need three things on the computer that will run autonomOS:
 2. **Node.js 20 or newer.** Check with `node --version`. If that prints an error or a version below 20, install Node from [nodejs.org](https://nodejs.org/en/download/package-manager) or with `brew install node` on a Mac.
 3. **Claude Code, installed and logged in.** Check with `claude --version`. If that prints an error, install Claude Code first ([claude.com/claude-code](https://claude.com/claude-code)), then run `claude` once in a terminal and complete the login it asks for. autonomOS cannot start without it, and its agents use that login.
 
-Codex and Gemini are optional. You can add them later; see [Other runtimes](08-other-runtimes.md).
+Codex, Gemini and Antigravity are optional. You can add them later; see [Other runtimes](08-other-runtimes.md).
 
 ## 1. Install
 
