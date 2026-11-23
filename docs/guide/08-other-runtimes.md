@@ -52,7 +52,7 @@ An Antigravity agent is a real Antigravity CLI (`agy`) session. Google moved per
 
 - **Messages arrive through you**, exactly as for Gemini: the "✉" badge and the "Incoming messages" panel.
 - **Permissions use Antigravity's own words.** `agentMode` is `default` (asks before acting), `accept-edits`, `auto` or `plan`; `toolPermission` is `request-review`, `strict`, `proceed-in-sandbox` or `always-proceed`. An agent starts as `agentMode=default`, even though Antigravity itself starts in `auto` when nothing is set.
-- **No "Needs input" status.** Antigravity reports tools and turns, but not when it is waiting for an answer, so look at its terminal if it seems stuck.
+- **No "Needs input" status.** Antigravity reports tools and turns, but not when it is waiting for an answer. While it asks "Run this command?" or "Allow calling this tool?", its row shows that tool as running; answer in its terminal.
 - **No paid credits.** When your plan's quota runs out, an autonomOS Antigravity agent waits for it to refresh. It never spends purchased AI credits, whatever your own Antigravity setting says. Type `/usage` in its terminal to see what's left.
 - **A restart resumes the conversation.**
 

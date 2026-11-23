@@ -50,6 +50,8 @@ const { agyAcceptsOutput, agySettingsValue } = await import(
 );
 const { BASE_CONTEXT } = await import("../providers/shared.js");
 
+const TOOL_HOOK_EVENTS = new Set(["PreToolUse", "PostToolUse"]);
+
 const fixture = (name: string) =>
   JSON.parse(
     readFileSync(new URL(`./fixtures/${name}`, import.meta.url), "utf8"),
@@ -300,6 +302,34 @@ describe("agy global config: the autonomos entry", () => {
     assert.equal(server.args.at(-1), script);
     assert.match(server.env.AUTONOMOS_SERVER_URL, /^ws\+unix:\/\//);
     assert.equal(server.env.AUTONOMOS_AGENT_TOKEN, undefined);
+  });
+
+  it("only SessionStart's command may reply: a PreToolUse `{}` denies the tool", () => {
+    const hooks = (() => {
+      const home = mkdtempSync(join(tmpdir(), "aos-agy-deny-"));
+      writeAntigravityConfig(script, { HOME: home });
+      return JSON.parse(
+        readFileSync(join(home, ".gemini", "config", "hooks.json"), "utf8"),
+      )[AGY_ENTRY];
+    })();
+    for (const event of AGY_HOOK_EVENTS) {
+      if (event === "SessionStart") continue;
+      const handlers = (
+        TOOL_HOOK_EVENTS.has(event) ? hooks[event][0].hooks : hooks[event]
+      ) as { command: string }[];
+      for (const h of handlers) assert.equal(h.command, AGY_HOOK_CMD, event);
+    }
+    // In an autonomOS spawn whose relay is unreachable, still silent.
+    const out = execFileSync("sh", ["-c", AGY_HOOK_CMD], {
+      input: "{}",
+      env: {
+        PATH: process.env.PATH ?? "/usr/bin:/bin",
+        AUTONOMOS_SESSION_ID: "s",
+        AUTONOMOS_INTERNAL_SOCKET: "/nonexistent.sock",
+      },
+      encoding: "utf8",
+    });
+    assert.equal(out, "");
   });
 
   it("refuses to overwrite a file that isn't a JSON object", () => {

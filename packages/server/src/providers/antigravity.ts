@@ -84,7 +84,14 @@ export const AGY_SESSION_START_CMD =
   ' -d @- "http://localhost/api/hooks/${AUTONOMOS_SESSION_ID}"' +
   ' 2>/dev/null || echo "{}"';
 
-/** Every other event: the shared relay, skipped outright outside autonomOS. */
+/**
+ * Every other event: the shared relay, skipped outright outside autonomOS.
+ *
+ * MUST print NOTHING. agy reads every hook's stdout as a reply, and a
+ * PreToolUse reply of `{}` (no `decision`) DENIES the tool call ("tool call
+ * denied by pre-tool hook" — measured on 1.5.14); an empty reply lets it run.
+ * HOOK_CMD sends curl's output to /dev/null, which is what keeps this safe.
+ */
 export const AGY_HOOK_CMD = `[ -n "\${AUTONOMOS_SESSION_ID}" ] || exit 0; ${HOOK_CMD}`;
 
 /**
